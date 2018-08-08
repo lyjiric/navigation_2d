@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   costmap_2d
   sensor_msgs
+  rospy
+  dynamic_reconfigure
 )
 
 ################################################
@@ -20,13 +22,21 @@ add_message_files(FILES cmd.msg)
 ## Generate added messages and services with any dependencies listed here
 generate_messages()
 
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+   cfg/para.cfg
+ )
+
 ###################################
 ## catkin specific configuration ##
 ###################################
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES RobotOperator
-  CATKIN_DEPENDS roscpp message_runtime tf costmap_2d sensor_msgs
+  CATKIN_DEPENDS roscpp message_runtime tf costmap_2d sensor_msgs rospy dynamic_reconfigure
 )
 
 ###########
@@ -48,7 +58,7 @@ target_link_libraries(operator RobotOperator)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(RobotOperator nav2d_operator_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
-
+add_dependencies(RobotOperator nav2d_operator_gencfg)
 
 #############
 ## Install ##
