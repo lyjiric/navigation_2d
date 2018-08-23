@@ -49,13 +49,13 @@ int main(int argc, char **argv)
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>::
    CallbackType f;
 
-	init(argc, argv, NODE_NAME);
+   ros::init(argc, argv, "node");
 	NodeHandle n("~/");
 
 	double frequency;
  
-       // n.param("frequency", frequency, 100.0);
-//	ROS_INFO("Operator will run at %.2f Hz.", frequency);
+        n.param("frequency", frequency, 100.0);
+	ROS_INFO("Operator will run at %.2f Hz.", frequency);
 
 	RobotOperator robOp;
 	
