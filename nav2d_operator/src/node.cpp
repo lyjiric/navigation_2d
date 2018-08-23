@@ -43,14 +43,14 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
 
 int main(int argc, char **argv)
 {
+   init(argc, argv, "node_dynamic_reconfigure");
+   NodeHandle n("~/");
+
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>
    server;
 
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>::
    CallbackType f;
-
-   ros::init(argc, argv, "node");
-	NodeHandle n("~/");
 
 	double frequency;
  
