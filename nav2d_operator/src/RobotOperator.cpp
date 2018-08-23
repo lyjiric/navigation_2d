@@ -1,6 +1,5 @@
 #include <nav_msgs/GridCells.h>
 #include <math.h>
-
 #include <nav2d_operator/RobotOperator.h>
 
 #define PI 3.14159265
@@ -18,23 +17,24 @@ RobotOperator::RobotOperator()
 	mCommandSubscriber = robotNode.subscribe(COMMAND_TOPIC, 1, &RobotOperator::receiveCommand, this);
 	mControlPublisher = robotNode.advertise<geometry_msgs::Twist>(CONTROL_TOPIC, 1);
 	mCostPublisher = robotNode.advertise<geometry_msgs::Vector3>("costs", 1);
-	
+
+
 	// Get parameters from the parameter server
 	ros::NodeHandle operatorNode("~/");
-	operatorNode.param("publish_route", mPublishRoute, false);
+//	operatorNode.param("publish_route", mPublishRoute, false);
 	if(mPublishRoute)
 	{
 		ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
 		mTrajectoryPublisher = operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
 		mPlanPublisher = operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
 	}
-	operatorNode.param("max_free_space", mMaxFreeSpace, 5.0);
-	operatorNode.param("safety_decay", mSafetyDecay, 0.95);
-	operatorNode.param("safety_weight", mSafetyWeight, 1);
-	operatorNode.param("conformance_weight", mConformanceWeight, 1);
-	operatorNode.param("continue_weight", mContinueWeight, 1);
-	operatorNode.param("escape_weight", mEscapeWeight, 1);
-	operatorNode.param("max_velocity", mMaxVelocity, 1.0);
+//	operatorNode.param("max_free_space", mMaxFreeSpace, 5.0);
+//	operatorNode.param("safety_decay", mSafetyDecay, 0.95);
+//	operatorNode.param("safety_weight", mSafetyWeight, 1);
+//	operatorNode.param("conformance_weight", mConformanceWeight, 1);
+//	operatorNode.param("continue_weight", mContinueWeight, 1);
+//	operatorNode.param("escape_weight", mEscapeWeight, 1);
+//	operatorNode.param("max_velocity", mMaxVelocity, 1.0);
 
 	// Apply tf_prefix to all used frame-id's
 	mRobotFrame = mTfListener.resolve(mRobotFrame);
@@ -513,4 +513,47 @@ sensor_msgs::PointCloud* RobotOperator::getPointCloud(double direction, double v
 	int offset = (velocity >= 0) ? LUT_RESOLUTION : 3*LUT_RESOLUTION + 1;
 	int table_index = (direction * LUT_RESOLUTION) + offset;
 	return mTrajTable[table_index];
+}
+
+
+// Access functions:
+
+void RobotOperator::setPublishRoute(bool publish_route)
+{
+  mPublishRoute = publish_route;
+}
+
+void RobotOperator::setMaxFreeSpace(double max_free_space)
+{
+  mMaxFreeSpace = max_free_space;
+}
+
+void RobotOperator::setSafetyDecay(double safety_decay)
+{ 
+  mSafetyDecay = safety_decay;
+}
+
+void RobotOperator::setSafetyWeight(int safety_weight)
+{
+  mSafetyWeight = safety_weight;
+}
+
+void RobotOperator::setConformanceWeight(int conformance_weight)
+{
+  mConformanceWeight = conformance_weight;
+}
+
+void RobotOperator::setContinueWeight(int continue_weight)
+{
+  mContinueWeight = continue_weight;
+}
+
+void RobotOperator::setEscapeWeight(int escape_weight)
+{
+  mEscapeWeight = escape_weight;
+}
+
+void RobotOperator::setMaxVelocity(double max_velocity)
+{
+  mMaxVelocity = max_velocity;
 }

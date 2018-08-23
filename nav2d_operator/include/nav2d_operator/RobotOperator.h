@@ -50,6 +50,16 @@ public:
 	 */
 	void executeCommand();
 
+        // Access Functions:
+        void setPublishRoute(bool publish_route);
+        void setMaxFreeSpace(double max_free_space);
+        void setSafetyDecay(double safety_decay);
+        void setSafetyWeight(int safety_weight);
+        void setConformanceWeight(int conformance_weight);
+        void setContinueWeight(int continue_weight);
+        void setEscapeWeight(int escape_weight);
+        void setMaxVelocity(double max_velocity);
+
 private:
 	// Internal Methods
 	/**
