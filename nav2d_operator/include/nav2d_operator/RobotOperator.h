@@ -60,6 +60,8 @@ public:
         void setEscapeWeight(int escape_weight);
         void setMaxVelocity(double max_velocity);
 
+        void setTrajectoryPublisher(ros::NodeHandle nh);
+        void setPlanPublisher(ros::NodeHandle nh);
 private:
 	// Internal Methods
 	/**

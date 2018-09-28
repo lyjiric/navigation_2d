@@ -14,27 +14,14 @@ RobotOperator::RobotOperator()
 //	ros::NodeHandle robotNode;
 //	robotNode.param("robot_frame", mRobotFrame, std::string("robot"));
 //	robotNode.param("odometry_frame", mOdometryFrame, std::string("odometry_base"));
-//	mCommandSubscriber = robotNode.subscribe(COMMAND_TOPIC, 1, &RobotOperator::receiveCommand, this);
-//	mControlPublisher = robotNode.advertise<geometry_msgs::Twist>(CONTROL_TOPIC, 1);
-//	mCostPublisher = robotNode.advertise<geometry_msgs::Vector3>("costs", 1);
 
-// Get parameters from the parameter server
-//	ros::NodeHandle operatorNode("~/");
-//	operatorNode.param("publish_route", mPublishRoute, false);
-//	if(mPublishRoute)
-//	{
-//		ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
-//		mTrajectoryPublisher = operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
-//		mPlanPublisher = operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
-//	}
-//	operatorNode.param("max_free_space", mMaxFreeSpace, 5.0);
-//	operatorNode.param("safety_decay", mSafetyDecay, 0.95);
-//	operatorNode.param("safety_weight", mSafetyWeight, 1);
-//	operatorNode.param("conformance_weight", mConformanceWeight, 1);
-//	operatorNode.param("continue_weight", mContinueWeight, 1);
-//	operatorNode.param("escape_weight", mEscapeWeight, 1);
-//	operatorNode.param("max_velocity", mMaxVelocity, 1.0);
-
+/*	if(mPublishRoute)
+	{
+		ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
+		mTrajectoryPublisher = operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
+		mPlanPublisher = operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
+	}
+*/
 	// Apply tf_prefix to all used frame-id's
 	mRobotFrame = mTfListener.resolve(mRobotFrame);
 	mOdometryFrame = mTfListener.resolve(mOdometryFrame);
@@ -555,4 +542,14 @@ void RobotOperator::setEscapeWeight(int escape_weight)
 void RobotOperator::setMaxVelocity(double max_velocity)
 {
   mMaxVelocity = max_velocity;
+}
+
+void RobotOperator::setTrajectoryPublisher(ros::NodeHandle nh)
+{
+ mTrajectoryPublisher = nh.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
+}
+
+void RobotOperator::setPlanPublisher(ros::NodeHandle nh)
+{
+  mPlanPublisher = nh.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
 }
