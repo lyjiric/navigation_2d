@@ -3,6 +3,7 @@
 #include <nav2d_operator/RobotOperator.h>
 #include <dynamic_reconfigure/server.h>
 #include <nav2d_operator/paraConfig.h>
+#include <nav_msgs/GridCells.h>
 
 using namespace ros;
 
@@ -28,7 +29,7 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
   gContinueWeight = config.continue_weight;
   gEscapeWeight = config.escape_weight;
   gMaxVelocity = config.max_velocity;
-
+/*
   ROS_INFO("Reconfigure Request from GUI: %f %s %f %f %d %d %d %d %f",
               config.frequency,
               config.publish_route?"True":"False",
@@ -39,13 +40,14 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
               config.continue_weight,
               config.escape_weight,
               config.max_velocity);
+*/
 }
 
 int main(int argc, char **argv)
 {
-   init(argc, argv, "node_dynamic_reconfigure");
+   init(argc, argv, NODE_NAME);
    NodeHandle operatorNode("~/");
-
+   
    RobotOperator robOp;
 
    double frequency;
@@ -57,9 +59,10 @@ int main(int argc, char **argv)
    int continue_weight;
    int escape_weight;
    bool publish_route;
-
+   int counter=0;
 // Parameter initialization via parameter server
-   operatorNode.param("frequency", frequency, 10.0);
+   operatorNode.param("frequency", frequency, 0.2);
+   ROS_INFO("Operator is initialized to run at %.2f Hz.", frequency);
    operatorNode.param("publish_route", publish_route, false);
    operatorNode.param("max_free_space", max_free_space, 5.0);
    operatorNode.param("safety_decay", safety_decay, 0.95);
@@ -68,7 +71,7 @@ int main(int argc, char **argv)
    operatorNode.param("continue_weight", continue_weight, 1);
    operatorNode.param("escape_weight", escape_weight, 1);
    operatorNode.param("max_velocity", max_velocity, 1.0);
-
+   
    robOp.setPublishRoute(publish_route);
    robOp.setMaxFreeSpace(max_free_space);
    robOp.setSafetyDecay(safety_decay);
@@ -77,7 +80,7 @@ int main(int argc, char **argv)
    robOp.setContinueWeight(continue_weight);
    robOp.setEscapeWeight(escape_weight);
    robOp.setMaxVelocity(max_velocity);
- 
+  
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>
    server;
 
@@ -88,6 +91,14 @@ int main(int argc, char **argv)
    Rate loopRate(frequency);
    ROS_INFO("Operator is initialized to run at %.2f Hz.", frequency);
 
+
+   if(publish_route)
+       {
+          ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
+         robOp.setPublisherTopics(operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1), operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1));         
+       }
+
+
    while(ok())
    {
        spinOnce();
@@ -96,67 +107,82 @@ int main(int argc, char **argv)
        server.setCallback(f);
 
        //Adaption via GUI
-       if( (gPublishRoute!=0) && (gPublishRoute!=publish_route))
+       if (gPublishRoute!=publish_route)
        {
-         robOp.setPublishRoute(gPublishRoute);
-         ROS_INFO("rqt_dynreconfig: PublishRoute=%b", gPublishRoute);
+          robOp.setPublishRoute(gPublishRoute);
+//         ROS_INFO("rqt_dynreconfig: PublishRoute=%d", gPublishRoute);
+          if(gPublishRoute)
+          {
+            ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
+            robOp.setPublisherTopics(operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1), operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1));         
+          }
+         publish_route = gPublishRoute;
        } 
 
        if(gMaxFreeSpace != max_free_space)
        {
-         robOp.setMaxFreeSpace(max_free_space);
-         ROS_INFO("rqt_dynreconfig: MaxFreeSpace=%.2f", gMaxFreeSpace);
+         robOp.setMaxFreeSpace(gMaxFreeSpace);
+//         ROS_INFO("rqt_dynreconfig: MaxFreeSpace=%.2f", gMaxFreeSpace);
+         max_free_space=gMaxFreeSpace;
        } 
 
        if(gSafetyDecay!= safety_decay)
        {        
          robOp.setSafetyDecay(gSafetyDecay);
-         ROS_INFO("rqt_dynreconfig: SafetyDecay=%.2f", gSafetyDecay);
+//         ROS_INFO("rqt_dynreconfig: SafetyDecay=%.2f", gSafetyDecay);
+         safety_decay = gSafetyDecay;
        }       
 
        if(gConformanceWeight!=conformance_weight)
        {
          robOp.setConformanceWeight(gConformanceWeight);
-         ROS_INFO("rqt_dynreconfig: ConformanceWeight=%d", gConformanceWeight);
+//         ROS_INFO("rqt_dynreconfig: ConformanceWeight=%d", gConformanceWeight);
+         conformance_weight=gConformanceWeight;
        }
 
        if(gContinueWeight!=continue_weight)
        {
-         robOp.setContinueWeight(continue_weight);
-         ROS_INFO("rqt_dynreconfig: ContinueWeight=%d", gContinueWeight);
+         robOp.setContinueWeight(gContinueWeight);
+//         ROS_INFO("rqt_dynreconfig: ContinueWeight=%d", gContinueWeight);
+         continue_weight=gContinueWeight;
+       }
+       
+      if(gSafetyWeight!=safety_weight)
+       {
+         robOp.setSafetyWeight(gSafetyWeight);
+//         ROS_INFO("rqt_dynreconfig: SafetyWeight=%d", gSafetyWeight);
+         safety_weight=gSafetyWeight;
        }
 
       if(gEscapeWeight!=escape_weight)
       {
          robOp.setEscapeWeight(gEscapeWeight);
-         ROS_INFO("rqt_dynreconfig: EscapeWeight=%d", gEscapeWeight);
+//         ROS_INFO("rqt_dynreconfig: EscapeWeight=%d", gEscapeWeight);
+         escape_weight = gEscapeWeight;
       }      
 
       if(gMaxVelocity!=max_velocity)
       {
          robOp.setMaxVelocity(gMaxVelocity);
-         ROS_INFO("rqt_dynreconfig: MaxVeloctiy=%.2f", gMaxVelocity);
+//         ROS_INFO("rqt_dynreconfig: MaxVeloctiy=%.2f", gMaxVelocity);
+         max_velocity=gMaxVelocity;
       }	     
 
-      if(gFrequency!=frequency)
+      if((gFrequency!=frequency)&&(gFrequency!=0))
       {
          frequency = gFrequency;
          Rate loopRate(frequency);
-         ROS_INFO("rqt_dynreconfig: Frequency=%.2f", gFrequency);      
+         ROS_INFO("rqt_dynreconfig: Frequency is changed to %.2f Hz", gFrequency); 
+         frequency=gFrequency;     
       }	     
-       robOp.executeCommand();
-       loopRate.sleep();
+      // robOp.executeCommand();
 
        if(loopRate.cycleTime() > ros::Duration(1.0 / frequency))
 			ROS_WARN("Missed desired rate of %.2f Hz! Loop actually took %.4f seconds!",frequency, loopRate.cycleTime().toSec());
-
-             if(gPublishRoute)
-             {
-                ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
                                
-              robOp.setTrajectoryPublisher(operatorNode);
-              robOp.setPlanPublisher(operatorNode);
-             }
-	}
+       //counter++;
+       loopRate.sleep();
+  }//end of while loop
+
 	return 0;	
 }

@@ -59,9 +59,9 @@ public:
         void setContinueWeight(int continue_weight);
         void setEscapeWeight(int escape_weight);
         void setMaxVelocity(double max_velocity);
+        void setPublisherTopics(ros::Publisher MSG_ROUTE_TOPIC, ros::Publisher MSG_PLAN_TOPIC);
+        bool getPublishRoute();
 
-        void setTrajectoryPublisher(ros::NodeHandle nh);
-        void setPlanPublisher(ros::NodeHandle nh);
 private:
 	// Internal Methods
 	/**

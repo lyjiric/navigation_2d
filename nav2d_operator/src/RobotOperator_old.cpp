@@ -8,17 +8,21 @@
 RobotOperator::RobotOperator()
 {
 	// Create the local costmap
-//	mLocalMap = new costmap_2d::Costmap2DROS("local_map", mTfListener);
-//	mRasterSize = mLocalMap->getCostmap()->getResolution();
+	mLocalMap = new costmap_2d::Costmap2DROS("local_map", mTfListener);
+	mRasterSize = mLocalMap->getCostmap()->getResolution();
 	
-        // Publish / subscribe to ROS topics
-        ros::NodeHandle robotNode;
-        robotNode.param("robot_frame", mRobotFrame, std::string("robot"));
-        robotNode.param("odometry_frame", mOdometryFrame, std::string("odometry_base"));
-        mCommandSubscriber = robotNode.subscribe(COMMAND_TOPIC, 1, &RobotOperator::receiveCommand, this);
-        mControlPublisher = robotNode.advertise<geometry_msgs::Twist>(CONTROL_TOPIC, 1);
-        mCostPublisher = robotNode.advertise<geometry_msgs::Vector3>("costs", 1);
+	// Publish / subscribe to ROS topics
+//	ros::NodeHandle robotNode;
+//	robotNode.param("robot_frame", mRobotFrame, std::string("robot"));
+//	robotNode.param("odometry_frame", mOdometryFrame, std::string("odometry_base"));
 
+/*	if(mPublishRoute)
+	{
+		ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
+		mTrajectoryPublisher = operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
+		mPlanPublisher = operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
+	}
+*/
 	// Apply tf_prefix to all used frame-id's
 	mRobotFrame = mTfListener.resolve(mRobotFrame);
 	mOdometryFrame = mTfListener.resolve(mOdometryFrame);
@@ -504,58 +508,50 @@ sensor_msgs::PointCloud* RobotOperator::getPointCloud(double direction, double v
 void RobotOperator::setPublishRoute(bool publish_route)
 {
   mPublishRoute = publish_route;
-  ROS_INFO("RobotOperator: PublishRoute set as %d", mPublishRoute);
 }
 
 void RobotOperator::setMaxFreeSpace(double max_free_space)
 {
   mMaxFreeSpace = max_free_space;
-  ROS_INFO("RobotOperator: MaxFreeSpace set as %f", mMaxFreeSpace);
 }
 
 void RobotOperator::setSafetyDecay(double safety_decay)
 { 
   mSafetyDecay = safety_decay;
-  ROS_INFO("RobotOperator: SafetyDecay set as %f", mSafetyDecay);
 }
 
 void RobotOperator::setSafetyWeight(int safety_weight)
 {
   mSafetyWeight = safety_weight;
-  ROS_INFO("RobotOperator: SafetyWeight set as %d", mSafetyWeight);
 }
 
 void RobotOperator::setConformanceWeight(int conformance_weight)
 {
   mConformanceWeight = conformance_weight;
-  ROS_INFO("RobotOperator: ConformanceWeight set as %d", mConformanceWeight);
 }
 
 void RobotOperator::setContinueWeight(int continue_weight)
 {
   mContinueWeight = continue_weight;
-  ROS_INFO("RobotOperator: ContintueWeight set as %d", mContinueWeight);
 }
 
 void RobotOperator::setEscapeWeight(int escape_weight)
 {
   mEscapeWeight = escape_weight;
-  ROS_INFO("RobotOperator: EscapeWeight set as %d", mEscapeWeight);
 }
 
 void RobotOperator::setMaxVelocity(double max_velocity)
 {
   mMaxVelocity = max_velocity;
-  ROS_INFO("RobotOperator: MaxVel set as %f", mMaxVelocity);
+}
+/*
+void RobotOperator::setTrajectoryPublisher(ros::NodeHandle nh)
+{
+ mTrajectoryPublisher = nh.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1);
 }
 
-void RobotOperator::setPublisherTopics(ros::Publisher MSG_ROUTE_TOPIC, ros::Publisher MSG_PLAN_TOPIC)
+void RobotOperator::setPlanPublisher(ros::NodeHandle nh)
 {
-  mTrajectoryPublisher = MSG_ROUTE_TOPIC;
-  mPlanPublisher = MSG_PLAN_TOPIC;
+  mPlanPublisher = nh.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1);
 }
-
-bool RobotOperator::getPublishRoute()
-{
-  return mPublishRoute;
-}
+*/
