@@ -16,6 +16,7 @@ int gSafetyWeight;
 int gContinueWeight;
 int gEscapeWeight;
 bool gPublishRoute;
+//bool gActionSaveParameterSet;
 
 // Parameter adjustment via GUI
 void callback(nav2d_operator::paraConfig &config, uint32_t level)
@@ -29,6 +30,9 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
   gContinueWeight = config.continue_weight;
   gEscapeWeight = config.escape_weight;
   gMaxVelocity = config.max_velocity;
+  
+//  gActionSaveParameterSet = config.action_save;
+
 /*
   ROS_INFO("Reconfigure Request from GUI: %f %s %f %f %d %d %d %d %f",
               config.frequency,
@@ -41,6 +45,8 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
               config.escape_weight,
               config.max_velocity);
 */
+ 
+
 }
 
 int main(int argc, char **argv)
@@ -59,7 +65,7 @@ int main(int argc, char **argv)
    int continue_weight;
    int escape_weight;
    bool publish_route;
-   int counter=0;
+
 // Parameter initialization via parameter server
    operatorNode.param("frequency", frequency, 0.2);
    ROS_INFO("Operator is initialized to run at %.2f Hz.", frequency);
@@ -87,6 +93,8 @@ int main(int argc, char **argv)
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>::
    CallbackType f;
 
+   f = boost::bind(&callback, _1, _2);
+   server.setCallback(f);
    
    Rate loopRate(frequency);
    ROS_INFO("Operator is initialized to run at %.2f Hz.", frequency);
@@ -102,9 +110,6 @@ int main(int argc, char **argv)
    while(ok())
    {
        spinOnce();
-
-       f = boost::bind(&callback, _1, _2);
-       server.setCallback(f);
 
        //Adaption via GUI
        if (gPublishRoute!=publish_route)
@@ -175,13 +180,21 @@ int main(int argc, char **argv)
          ROS_INFO("rqt_dynreconfig: Frequency is changed to %.2f Hz", gFrequency); 
          frequency=gFrequency;     
       }	     
-      // robOp.executeCommand();
-
-       if(loopRate.cycleTime() > ros::Duration(1.0 / frequency))
-			ROS_WARN("Missed desired rate of %.2f Hz! Loop actually took %.4f seconds!",frequency, loopRate.cycleTime().toSec());
+       
+    /* if(gActionSaveParameterSet)
+     {
+       operatorNode.setParam("max_velocity", gMaxVelocity);
+       ROS_INFO("OperatorNode: current parameter set is saved locally.");
+       gActionSaveParameterSet = false;
+     }
+*/
                                
-       //counter++;
-       loopRate.sleep();
+      robOp.executeCommand();
+       
+      loopRate.sleep();
+      
+      if(loopRate.cycleTime() > ros::Duration(1.0 / frequency))
+			ROS_WARN("Missed desired rate of %.2f Hz! Loop actually took %.4f seconds!",frequency, loopRate.cycleTime().toSec());
   }//end of while loop
 
 	return 0;	

@@ -8,8 +8,8 @@
 RobotOperator::RobotOperator()
 {
 	// Create the local costmap
-//	mLocalMap = new costmap_2d::Costmap2DROS("local_map", mTfListener);
-//	mRasterSize = mLocalMap->getCostmap()->getResolution();
+	mLocalMap = new costmap_2d::Costmap2DROS("local_map", mTfListener);
+	mRasterSize = mLocalMap->getCostmap()->getResolution();
 	
         // Publish / subscribe to ROS topics
         ros::NodeHandle robotNode;
