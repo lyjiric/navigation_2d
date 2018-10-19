@@ -59,9 +59,16 @@ public:
         void setContinueWeight(int continue_weight);
         void setEscapeWeight(int escape_weight);
         void setMaxVelocity(double max_velocity);
-        void setPublisherTopics(ros::Publisher MSG_ROUTE_TOPIC, ros::Publisher MSG_PLAN_TOPIC);
-        bool getPublishRoute();
 
+        bool getPublishRoute();
+        double getMaxFreeSpace();
+        double getSafetyDecay();
+        int getSafetyWeight();
+        int getConformanceWeight();
+        int getContinueWeight();
+        int getEscapeWeight();
+        double getMaxVelocity();
+       
 private:
 	// Internal Methods
 	/**
@@ -128,7 +135,6 @@ private:
 	sensor_msgs::PointCloud* mTrajTable[(LUT_RESOLUTION * 4) + 2];
 	
 	double mMaxVelocity;
-	
 	bool mPublishRoute;
 	double mMaxFreeSpace;
 	double mSafetyDecay;

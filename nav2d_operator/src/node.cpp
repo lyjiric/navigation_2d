@@ -8,23 +8,29 @@
 using namespace ros;
 
 // Global parameters:
-RobotOperator gRobOp;
+RobotOperator* gPointer;
 double gFrequency;
-bool gPublishRoute;
 
 // Parameter adjustment via GUI
 void callback(nav2d_operator::paraConfig &config, uint32_t level)
 {
-   gFrequency = config.frequency;
-   gRobOp.setPublishRoute(config.publish_route);
-   gPublishRoute = config.publish_route;
-   gRobOp.setMaxFreeSpace(config.max_free_space);
-   gRobOp.setSafetyDecay(config.safety_decay);
-   gRobOp.setSafetyWeight(config.safety_weight);
-   gRobOp.setConformanceWeight(config.conformance_weight);
-   gRobOp.setContinueWeight(config.continue_weight);
-   gRobOp.setEscapeWeight(config.escape_weight);
-   gRobOp.setMaxVelocity(config.max_velocity);
+   gFrequency=config.frequency;
+   if(gPointer->getPublishRoute() != config.publish_route) 
+	gPointer->setPublishRoute(config.publish_route);
+   if(gPointer->getMaxFreeSpace() != config.max_free_space)
+	gPointer->setMaxFreeSpace(config.max_free_space);
+   if(gPointer->getSafetyDecay() != config.safety_decay)
+       gPointer->setSafetyDecay(config.safety_decay);
+   if(gPointer->getSafetyWeight() != config.safety_weight)
+       gPointer->setSafetyWeight(config.safety_weight);
+   if(gPointer->getConformanceWeight() !=config.conformance_weight) 
+       gPointer->setConformanceWeight(config.conformance_weight);
+   if(gPointer->getContinueWeight() !=config.continue_weight)
+       gPointer->setContinueWeight(config.continue_weight);
+   if(gPointer->getEscapeWeight() !=config.escape_weight)
+       gPointer->setEscapeWeight(config.escape_weight);
+   if(gPointer->getMaxVelocity() !=config.max_velocity)
+       gPointer->setMaxVelocity(config.max_velocity);
 
 /*
   ROS_INFO("Reconfigure Request from GUI: %f %s %f %f %d %d %d %d %f",
@@ -40,10 +46,14 @@ void callback(nav2d_operator::paraConfig &config, uint32_t level)
 */
 }
 
+         
 int main(int argc, char **argv)
 {
    init(argc, argv, NODE_NAME);
-   NodeHandle operatorNode("~/");
+   
+   RobotOperator RobOp;
+   gPointer = &RobOp;
+   
    double frequency; 
   
    dynamic_reconfigure::Server<nav2d_operator::paraConfig>
@@ -54,43 +64,40 @@ int main(int argc, char **argv)
 
    f = boost::bind(&callback, _1, _2);
    server.setCallback(f);
-   
-   if(gFrequency!=0)
-   { 
-     frequency = gFrequency;
-     Rate loopRate(frequency);
-     ROS_INFO("Operator is initialized to run at %.2f Hz.", frequency);
+ 
+   if(gFrequency==0)
+   {
+     ROS_ERROR("Operator receives a setting of loop frequency of zero! Set to 1Hz.");
+     frequency = 1;
    }
-   else ROS_ERROR("Operator has a loop rate zero!");
+  else
+  {
+    ROS_INFO("Operator frequency is initialized to %.2f Hz", gFrequency); 
+    frequency = gFrequency; 
+  }
+  
+  Rate loopRate(frequency);
 
-   while(ok())
+ while(ok())
    {
        spinOnce();
 
-       //Adaption via GUI
-//         ROS_INFO("rqt_dynreconfig: PublishRoute=%d", gPublishRoute);
-      if(gPublishRoute)
+      if((gFrequency!=frequency) && (gFrequency!=0))
       {
-         ROS_INFO("Will publish desired direction on '%s' and control direction on '%s'.", ROUTE_TOPIC, PLAN_TOPIC);
-         gRobOp.setPublisherTopics(operatorNode.advertise<nav_msgs::GridCells>(ROUTE_TOPIC, 1), operatorNode.advertise<nav_msgs::GridCells>(PLAN_TOPIC, 1));         
-      }
-
-      if((gFrequency!=0)&& (gFrequency!= frequency))
-      {
-         Rate loopRate(gFrequency);
-         loopRate.sleep();
          ROS_INFO("rqt_dynreconfig: Frequency is changed to %.2f Hz", gFrequency); 
-         frequency=gFrequency;     
-         
-         if(loopRate.cycleTime() > ros::Duration(1.0 / frequency))
+         Rate loopRate(gFrequency);
+         frequency = gFrequency;
+      }
+      
+      if(loopRate.cycleTime() > ros::Duration(1.0 / frequency))
 			ROS_WARN("Missed desired rate of %.2f Hz! Loop actually took %.4f seconds!",frequency, loopRate.cycleTime().toSec());
-      }	     
-      else ROS_ERROR("Operator has a loop rate zero!");
      
-      gRobOp.executeCommand();
+      gPointer->executeCommand();
        
+      loopRate.sleep();
       
   }//end of while loop
 
 	return 0;	
 }
+
