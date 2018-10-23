@@ -65,24 +65,16 @@ int main(int argc, char **argv)
    f = boost::bind(&callback, _1, _2);
    server.setCallback(f);
  
-   if(gFrequency==0)
-   {
-     ROS_ERROR("Operator receives a setting of loop frequency of zero! Set to 1Hz.");
-     frequency = 1;
-   }
-  else
-  {
-    ROS_INFO("Operator frequency is initialized to %.2f Hz", gFrequency); 
-    frequency = gFrequency; 
-  }
-  
-  Rate loopRate(frequency);
+   frequency = gFrequency; 
+   ROS_INFO("Operator frequency is initialized to %.2f Hz", gFrequency); 
 
- while(ok())
+   Rate loopRate(gFrequency);
+
+  while(ok())
    {
        spinOnce();
 
-      if((gFrequency!=frequency) && (gFrequency!=0))
+      if(gFrequency!=frequency) 
       {
          ROS_INFO("rqt_dynreconfig: Frequency is changed to %.2f Hz", gFrequency); 
          Rate loopRate(gFrequency);
