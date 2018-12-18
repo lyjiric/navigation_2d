@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav2d_operator
   nav2d_msgs
+  dynamic_reconfigure
 )
 
 ################################################
@@ -34,6 +35,14 @@ generate_messages(
   geometry_msgs
 )
 
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+   cfg/para_nav.cfg
+)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -50,6 +59,7 @@ catkin_package(
     geometry_msgs
     nav2d_msgs
     nav2d_operator
+    dynamic_reconfigure
 )
 
 ###########
@@ -79,6 +89,7 @@ add_dependencies(set_goal_client nav2d_navigator_generate_messages_cpp ${catkin_
 add_dependencies(explore_client nav2d_navigator_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 add_dependencies(get_map_client nav2d_navigator_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 add_dependencies(localize_client nav2d_navigator_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+add_dependencies(RobotOperator nav2d_operator_gencfg)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(RobotNavigator MapInflationTool ${catkin_LIBRARIES})
