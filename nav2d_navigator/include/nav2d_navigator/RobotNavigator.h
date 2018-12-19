@@ -35,6 +35,29 @@ public:
 	void receiveGetMapGoal(const nav2d_navigator::GetFirstMapGoal::ConstPtr &goal);
 	void receiveLocalizeGoal(const nav2d_navigator::LocalizeGoal::ConstPtr &goal);
 
+	// Access Functions:
+        void setFrequency(double frequency);
+	void setInflationRadius(double inflation_radius);
+	void setRobotRadius(double robot_radius);
+	void setCommandTargetDistance(double command_target_distance);
+	void setNavigationGoalDistance(double navigation_goal_distance);
+ 	void setNavigationGoalAngle(double navigation_goal_angle);
+ 	void setNavigationHomingDistance(double navigation_homing_distance);
+	void setExplorationGoalDistance(double exploration_goal_distance);
+	void setMinReplanningPeriod(double min_replanning_period);
+	void setMaxReplanningPeriod(double max_replanning_period);
+
+	double getFrequency();
+	double getInflationRadius();
+	double getRobotRadius();
+	double getCommandTargetDistance();
+	double getNavigationGoalDistance();
+	double getNavigationGoalAngle();
+	double getNavigationHomingDistance();
+	double getExplorationGoalDistance();
+	double getMinReplanningPeriod();
+	double getMaxReplanningPeriod();
+
 private:
 	bool isLocalized();
 	bool setCurrentPosition();

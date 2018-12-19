@@ -41,7 +41,7 @@ RobotNavigator::RobotNavigator()
 	navigatorNode.param("min_replanning_period", mMinReplanningPeriod, 3.0);
 	navigatorNode.param("max_replanning_period", mMaxReplanningPeriod, 1.0);
 	navigatorNode.param("command_target_distance", mCommandTargetDistance, 1.0);
-	navigatorNode.param("frequency", mFrequency, 10.0);
+//	navigatorNode.param("frequency", mFrequency, 10.0);
 	mCostObstacle = 100;
 	mCostLethal = (1.0 - (mRobotRadius / mInflationRadius)) * (double)mCostObstacle;
 
@@ -955,4 +955,119 @@ bool RobotNavigator::setCurrentPosition()
 	mCurrentPositionX = world_x;
 	mCurrentPositionY = world_y;
 	return true;
+}
+
+// Access Functions:
+void RobotNavigator::setFrequency(double frequency)
+{
+	mFrequency = frequency;
+	ROS_INFO("RobotNavigation: frequency is set as %d", mFrequency);
+}
+
+void RobotNavigator::setInflationRadius(double inflation_radius)
+{
+	mInflationRadius = inflation_radius;
+	ROS_INFO("RobotNavigation: inflation radius is set as %d", mInflationRadius);
+}
+
+void RobotNavigator::setRobotRadius(double robot_radius)
+{
+	mRobotRadius = robot_radius;
+	ROS_INFO("RobotNavigation: robot radius is set as %d", mRobotRadius);
+}
+
+void RobotNavigator::setCommandTargetDistance(double command_target_distance)
+{
+	mCommandTargetDistance = command_target_distance;
+	ROS_INFO("RobotNavigation: command target distance is set as %d", mCommandTargetDistance);
+}
+
+
+void RobotNavigator::setNavigationGoalDistance(double navigation_goal_distance)
+{
+	mNavigationGoalDistance = navigation_goal_distance;
+	ROS_INFO("RobotNavigation: navigation goal distance is set as %d", mNavigationGoalDistance);
+}
+
+
+void RobotNavigator::setNavigationGoalAngle(double navigation_goal_angle)
+{
+	mNavigationGoalDistance = navigation_goal_angle;
+	ROS_INFO("RobotNavigation: navigation goal angle is set as %d", mNavigationGoalAngle);
+}
+
+
+void RobotNavigator::setNavigationHomingDistance(double navigation_homing_distance)
+{
+	mNavigationGoalDistance = navigation_homing_distance;
+	ROS_INFO("RobotNavigation: navigation homing distance is set as %d", mNavigationHomingDistance);
+}
+
+
+void RobotNavigator::setExplorationGoalDistance(double exploration_goal_distance)
+{
+	mExplorationGoalDistance = exploration_goal_distance;
+	ROS_INFO("RobotNavigation: exploration goal distance is set as %d", mExplorationGoalDistance);
+}
+
+void RobotNavigator::setMinReplanningPeriod(double min_replanning_period)
+{
+	mMinReplanningPeriod = min_replanning_period;
+	ROS_INFO("RobotNavigation: min replanning period is set as %d", mMinReplanningPeriod);
+}
+
+void RobotNavigator::setMaxReplanningPeriod(double max_replanning_period)
+{
+	mMaxReplanningPeriod = max_replanning_period;
+	ROS_INFO("RobotNavigation: max replanning period is set as %d", mMaxReplanningPeriod);
+}
+
+double RobotNavigator::getFrequency()
+{
+	return mFrequency;
+}
+
+double RobotNavigator::getInflationRadius()
+{
+	return mInflationRadius;
+}
+
+double RobotNavigator::getRobotRadius()
+{
+	return mRobotRadius;
+}
+
+double RobotNavigator::getCommandTargetDistance()
+{
+	return mCommandTargetDistance;
+}
+
+double RobotNavigator::getNavigationGoalDistance()
+{
+	return mNavigationGoalDistance;
+}
+
+double RobotNavigator::getNavigationGoalAngle()
+{
+	return mNavigationGoalAngle;
+}
+
+double RobotNavigator::getNavigationHomingDistance()
+{
+	return mNavigationHomingDistance;
+}
+
+double RobotNavigator::getExplorationGoalDistance()
+{
+	return mExplorationGoalDistance;
+}
+        
+double RobotNavigator::getMinReplanningPeriod()
+{
+	return mMinReplanningPeriod;
+}
+        
+double RobotNavigator::getMaxReplanningPeriod()
+{
+	return mMaxReplanningPeriod;
 }
